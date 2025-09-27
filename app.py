@@ -39,7 +39,7 @@ tools = [{"type": "function", "function": get_holidays_for_date_json}]
 
 
 class MarketingDb:
-    holiday_df = pd.read_csv("resurces/HolidaysDB.tsv", sep='\t')
+    holiday_df = pd.read_csv("resources/HolidaysDB.tsv", sep='\t')
 
 class Me:
     def __init__(self):
@@ -86,7 +86,10 @@ class Me:
         return response.choices[0].message.content
     
 
+# Create the Gradio interface for Hugging Face Spaces
+me = Me()
+demo = gr.ChatInterface(me.chat, type="messages")
+
 if __name__ == "__main__":
-    me = Me()
-    gr.ChatInterface(me.chat, type="messages").launch()
+    demo.launch()
     
