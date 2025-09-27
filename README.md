@@ -2,8 +2,9 @@
 title: HolidayPostsGenerator
 app_file: app.py
 sdk: gradio
-sdk_version: 5.45.0
+sdk_version: 5.31.0
 ---
+
 # Holiday Posts Generator
 
 A LinkedIn post generator for Ag-Tech companies using holiday data. This application uses OpenAI's GPT models to generate engaging "did you know?" style posts based on holiday information.

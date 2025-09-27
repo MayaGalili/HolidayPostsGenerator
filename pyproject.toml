@@ -1,0 +1,27 @@
+[project]
+name = "holiday-posts-generator"
+version = "0.1.0"
+description = "A LinkedIn post generator for Ag-Tech company using holiday data"
+requires-python = ">=3.9"
+dependencies = [
+    "gradio>=4.0.0",
+    "pypdf>=3.0.0",
+    "openai>=1.0.0",
+    "pandas>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "flake8>=5.0.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
