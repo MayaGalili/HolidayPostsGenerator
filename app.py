@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
-from pypdf import PdfReader
 import gradio as gr
 import pandas as pd
 
