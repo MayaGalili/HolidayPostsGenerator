@@ -13,7 +13,7 @@ A LinkedIn post generator for Ag-Tech companies using holiday data. This applica
 
 Here's how the application looks when deployed on Hugging Face Spaces:
 
-![Holiday Posts Generator Interface](resources/Chat_Screenshot.png)
+### Holiday Posts Generator Interface
 
 The chatbot interface allows users to:
 - Ask for posts for specific dates
