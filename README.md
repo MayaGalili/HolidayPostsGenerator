@@ -154,11 +154,18 @@ The `uv.lock` file ensures all dependencies are locked to specific versions for 
 HolidayPostsGenerator/
 ├── app.py                 # Main application code
 ├── run.py                 # Simple runner script
+├── .env                   # Holds the AI key and HF key
+├── .gitignore             # files to ignore
+├── ingest.py              # One time script that digest the company's docs to vector DB
 ├── pyproject.toml         # Project configuration
-├── uv.lock               # Locked dependencies (uv)
-├── requirements.txt      # Dependencies (pip)
-├── README.md             # This file
+├── uv.lock                # Locked dependencies (uv)
+├── requirements.txt       # Dependencies (pip)
+├── README.md              # This file
+├── chroma_db_data/        # Knowlage vector DB
 └── resources/
-    ├── HolidaysDB.tsv    # Holiday database
-    └── Chat_Screenshot.png # Interface preview
+    ├── HolidaysDB.json    # Holiday database
+    └── company_documents/ # Company's docs (PDF / TXT / MD)
+        ├── soil_sensors_product.txt
+        ├── drone_pollination_case_study.txt
+        └── smart_irrigation_blog.md
 ```
