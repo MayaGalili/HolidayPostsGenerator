@@ -4,6 +4,8 @@ import json
 import gradio as gr
 import chromadb
 from chromadb.utils import embedding_functions
+import os
+from ingest import run_ingestion
 
 load_dotenv(override=True)
 
@@ -135,12 +137,14 @@ class Me:
             else:
                 done = True
         return response.choices[0].message.content
-    
 
-# Create the Gradio interface for Hugging Face Spaces
-me = Me()
-demo = gr.ChatInterface(me.chat, type="messages")
 
 if __name__ == "__main__":
+    if not os.path.exists("chroma_db_data") or not os.listdir("chroma_db_data"):
+        print("ChromaDB not found. Running ingestion on startup...")
+        run_ingestion()
+
+    me = Me()
+    demo = gr.ChatInterface(me.chat, type="messages")
     demo.launch()
     
