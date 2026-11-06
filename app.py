@@ -2,48 +2,98 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 import gradio as gr
-import pandas as pd
-
 
 load_dotenv(override=True)
 
+import chromadb
+from chromadb.utils import embedding_functions
+import os
 
-def find_my_holiday(date: str):
-    df = MarketingDb.holiday_df
-    result =df[df['Date'] == date].T.dropna()
-    if not result.empty:
-        return result.to_dict()
-    else:
-        return {}
+
+class MarketingDb:
+    with open("resources/HolidaysDB.json", "r", encoding="utf-8") as f:
+        holidays_data = json.load(f)
+
+
 
 
 get_holidays_for_date_json = {
     "name": "find_my_holiday",
-    "description": "Get the list of holidays for a given date.",
+    "description": "Get the list of holidays for a given date or for an entire month.",
     "parameters": {
         "type": "object",
         "properties": {
-            "date": {
+            "month": {
                 "type": "string",
-                "description": "The date to look up, in the same format as the table (e.g. 'June 10')"
+                "description": "The full month name in English with Capital first letter(e.g. 'June', 'January')."
+            },
+                "day": {
+                "type": "string",
+                "description": "The day of the month as a string number (e.g. '10', '2'). If the user asks for the whole month, use 'Full Month'."
             }
         },
-        "required": ["date"],
+        "required": ["month", "day"],
+        "additionalProperties": False
+    }
+}
+
+search_knowledge_base_json = {
+    "name": "search_company_knowledge_base",
+    "description": "Search the Ag-Tech company's internal articles, products, and case studies for relevant context.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "Topic or keyword to search in the knowledge base (e.g. 'soil sensors', 'bees')"
+            }
+        },
+        "required": ["query"],
         "additionalProperties": False
     }
 }
 
 
-tools = [{"type": "function", "function": get_holidays_for_date_json}]
+tools = [{"type": "function", "function": get_holidays_for_date_json}, 
+         {"type": "function", "function": search_knowledge_base_json}]
 
 
-class MarketingDb:
-    holiday_df = pd.read_csv("resources/HolidaysDB.tsv", sep='\t')
+class KnowledgeBase:
 
+    def __init__(self):
+        openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            model_name="text-embedding-3-small",
+        )
+        self.client = chromadb.PersistentClient(path="./chroma_db_data")
+        self.collection = self.client.get_or_create_collection(
+            name="company_knowledge_base", embedding_function=openai_ef
+        )
+
+    def search(self, query: str, top_k: int = 2):
+        results = self.collection.query(query_texts=[query], n_results=top_k)
+        return results.get("documents", [[]])[0]
+    
 class Me:
     def __init__(self):
         self.openai = OpenAI()
         self.name = "LinkedIn Post Generator"
+        self.kb = KnowledgeBase()
+
+    def find_my_holiday(self, month: str, day: str) -> dict:
+        month_formatted = month.capitalize()
+
+        month_data = MarketingDb.holidays_data.get(month_formatted, {})
+        results = {}
+        if day in month_data:
+                results[day] = month_data[day]
+            
+        if "Full Month" in month_data:
+            results["Full Month"] = month_data["Full Month"]
+
+    def search_company_knowledge_base(self, query: str):
+        results =self.kb.search(query)
+        return {"context": results['documents'][0]}
 
     def handle_tool_call(self, tool_calls):
         results = []
