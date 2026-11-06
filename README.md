@@ -85,7 +85,7 @@ The chatbot interface allows users to:
 3. **Upload your files** to the space:
    - `app.py`
    - `pyproject.toml` 
-   - `uv.lock` (or `requirements.txt`)
+   - `uv.lock`
    - `resources/` folder (with `HolidaysDB.tsv`)
    - `README.md`
 
