@@ -9,6 +9,8 @@ dependencies = [
     "openai>=1.0.0",
     "pandas>=2.0.0",
     "python-dotenv>=1.0.0",
+    "chromadb>=1.5.9",
+    "pytest>=8.4.2",
 ]
 
 [project.optional-dependencies]
@@ -25,3 +27,4 @@ target-version = ['py38']
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+pythonpath = ["."]

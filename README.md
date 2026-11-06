@@ -29,8 +29,6 @@ The chatbot interface allows users to:
 
 ## Quick Start
 
-### Option 1: Using uv (Recommended)
-
 1. **Install uv** (if not already installed):
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -53,27 +51,16 @@ The chatbot interface allows users to:
    echo "OPENAI_API_KEY=your-api-key-here" > .env
    ```
 
+4. **Ingest company knowledge base documents**
+
+   Place your document files into resources/company_documents/, then build the vector database by running:   
+   ```bash
+   uv run python ingest.py
+   ```
+
 4. **Run the application**:
    ```bash
    uv run python run.py
-   ```
-
-### Option 2: Using pip
-
-1. **Clone and setup**:
-   ```bash
-   git clone <your-repo-url>
-   cd HolidayPostsGenerator
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-2. **Set up your OpenAI API key** (same as above)
-
-3. **Run the application**:
-   ```bash
-   python run.py
    ```
 
 ## Deployment
@@ -85,7 +72,7 @@ The chatbot interface allows users to:
 3. **Upload your files** to the space:
    - `app.py`
    - `pyproject.toml` 
-   - `uv.lock` (or `requirements.txt`)
+   - `uv.lock`
    - `resources/` folder (with `HolidaysDB.tsv`)
    - `README.md`
 
