@@ -73,11 +73,7 @@ class Me:
         self.kb = KnowledgeBase()
 
     def find_my_holiday(self, month: str, day: str) -> dict:
-        print("month:", month, "day:", day)
-        print("month:", type(month), "day:", type(day))
-
         month_formatted = month.capitalize()
-        print("found date in db:", MarketingDb.holidays_data[month][day])
         month_data = MarketingDb.holidays_data.get(month_formatted, {})
         results = {}
         if day in month_data:
@@ -130,7 +126,6 @@ class Me:
         done = False
         while not done:
             response = self.openai.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
-            print("im here...")
             if response.choices[0].finish_reason=="tool_calls":
                 message = response.choices[0].message
                 tool_calls = message.tool_calls
