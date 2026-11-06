@@ -143,7 +143,19 @@ if __name__ == "__main__":
     if not os.path.exists("chroma_db_data") or not os.listdir("chroma_db_data"):
         print("ChromaDB not found. Running ingestion on startup...")
         run_ingestion()
+    
+    welcome_msg = """
+        👋 **Welcome to AgroTech's Post Generator!**
 
+        I help you create engaging LinkedIn posts by pairing international awareness days with the AgTech company solutions.
+
+        👇 **Please enter a month and day to get started** (e.g., *June 10* or *August 12*).
+    """
+
+    custom_chatbot = gr.Chatbot(
+        value=[{"role": "assistant", "content": welcome_msg}],
+        type="messages"
+    )
     me = Me()
     demo = gr.ChatInterface(me.chat, type="messages")
     demo.launch()
