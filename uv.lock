@@ -1515,6 +1515,7 @@ dependencies = [
     { name = "openai" },
     { name = "pandas" },
     { name = "pypdf" },
+    { name = "pytest" },
     { name = "python-dotenv" },
 ]
 
@@ -1534,6 +1535,7 @@ requires-dist = [
     { name = "openai", specifier = ">=1.0.0" },
     { name = "pandas", specifier = ">=2.0.0" },
     { name = "pypdf", specifier = ">=3.0.0" },
+    { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
 ]

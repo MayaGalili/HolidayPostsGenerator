@@ -62,7 +62,7 @@ class KnowledgeBase:
 
     def __init__(self):
         openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-            api_key=os.getenv("OPENAI_API_KEY"),
+            api_key_env_var="OPENAI_API_KEY",
             model_name="text-embedding-3-small",
         )
         self.client = chromadb.PersistentClient(path="./chroma_db_data")
@@ -72,7 +72,7 @@ class KnowledgeBase:
 
     def search(self, query: str, top_k: int = 2):
         results = self.collection.query(query_texts=[query], n_results=top_k)
-        return results.get("documents", [[]])[0]
+        return results
     
 class Me:
     def __init__(self):
@@ -81,15 +81,20 @@ class Me:
         self.kb = KnowledgeBase()
 
     def find_my_holiday(self, month: str, day: str) -> dict:
-        month_formatted = month.capitalize()
+        print("month:", month, "day:", day)
+        print("month:", type(month), "day:", type(day))
 
+        month_formatted = month.capitalize()
+        print("found date in db:", MarketingDb.holidays_data[month][day])
         month_data = MarketingDb.holidays_data.get(month_formatted, {})
         results = {}
         if day in month_data:
-                results[day] = month_data[day]
+            results[day] = month_data[day]
             
         if "Full Month" in month_data:
             results["Full Month"] = month_data["Full Month"]
+
+        return results
 
     def search_company_knowledge_base(self, query: str):
         results =self.kb.search(query)
@@ -101,29 +106,39 @@ class Me:
             tool_name = tool_call.function.name
             arguments = json.loads(tool_call.function.arguments)
             print(f"Tool called: {tool_name}" + f" {arguments}", flush=True)
-            tool = globals().get(tool_name)
-            result = tool(**arguments) if tool else {}
-            results.append({"role": "tool","content": json.dumps(result),"tool_call_id": tool_call.id})
+
+            if hasattr(self, tool_name):
+                func = getattr(self, tool_name)
+                result = func(**arguments)
+            else:
+                print(f"⚠️ Error: Tool '{tool_name}' not found!")
+                result = {"error": f"Tool '{tool_name}' not found."}
+
+            results.append({"role": "tool",
+                            "content": json.dumps(result),
+                            "tool_call_id": tool_call.id})
         return results
     
     def system_prompt(self):
-        system_prompt = f"""
-        Your goal is to generate good and interesting LinkedIn posts for an Ag-Tech company via its Marketing help site. 
-        The post will be a 'did you know?' or 'fun fact' style post, that will increase the company's engagement.
-        Your responsibility is to represent {self.name} for interactions with the marketing team on the website as faithfully as possible.
-        Be professional and engaging, as if talking to a co-worker or manager that is using the website.
-        If you don't know the answer to any question, use your record_unknown_question tool to record the question that you couldn't answer, even if it's about something trivial or unrelated to post generation.
-        If the user is engaging in discussion, try to steer them towards giving you a date that they are interested in; ask for the date they want and, when provided, use your find_my_holiday_json tool to get the holidays for that date.
-        If holidays are found, generate 3 LinkedIn post ideas and ask the user to pick their favorite. If no holidays are found, inform the user.
-        With this context, please chat with the user, always staying in character as {self.name}.
+        return f"""
+            You are {self.name}, an AI Marketing Assistant for AgroScout.
+            Your task is to generate 3 engaging LinkedIn post ideas connecting awareness days/holidays with AgroScout's technology and solutions.
+
+            STRICT WORKFLOW - YOU MUST FOLLOW THESE STEPS IN ORDER:
+            1. When the user gives you a date/month, call `find_my_holiday` to get the list of holidays.
+            2. CRITICAL STEP: Once you receive the holiday results, YOU MUST IMMEDIATELY call `search_company_knowledge_base` using keywords from the relevant holidays/topics found (e.g., if you found 'National Potato Day', search for 'potato crop diseases analytics').
+            3. DO NOT write the posts until you have received the context from `search_company_knowledge_base`.
+            4. Once you have BOTH the holiday data AND the company knowledge base results, write 3 creative LinkedIn post ideas linking the holiday to AgroScout's technology.
+
+            NEVER make up facts about AgroScout without searching the knowledge base first.
         """
-        return system_prompt
     
     def chat(self, message, history):
         messages = [{"role": "system", "content": self.system_prompt()}] + history + [{"role": "user", "content": message}]
         done = False
         while not done:
             response = self.openai.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
+            print("im here...")
             if response.choices[0].finish_reason=="tool_calls":
                 message = response.choices[0].message
                 tool_calls = message.tool_calls
