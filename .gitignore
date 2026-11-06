@@ -184,3 +184,9 @@ cython_debug/
 
 # Resources Vector DB
 chroma_db_data/
+
+# hf unwanted files
+*.png
+*.jpg
+*.jpeg
+resources/*.png
