@@ -2,20 +2,14 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 import gradio as gr
-
-load_dotenv(override=True)
-
 import chromadb
 from chromadb.utils import embedding_functions
-import os
 
+load_dotenv(override=True)
 
 class MarketingDb:
     with open("resources/HolidaysDB.json", "r", encoding="utf-8") as f:
         holidays_data = json.load(f)
-
-
-
 
 get_holidays_for_date_json = {
     "name": "find_my_holiday",
@@ -53,10 +47,8 @@ search_knowledge_base_json = {
     }
 }
 
-
 tools = [{"type": "function", "function": get_holidays_for_date_json}, 
          {"type": "function", "function": search_knowledge_base_json}]
-
 
 class KnowledgeBase:
 
